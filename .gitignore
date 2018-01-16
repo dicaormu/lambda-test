@@ -1,0 +1,9 @@
+.env
+.serverless
+*.so
+*.zip
+vendor
+.env.example
+.env.template
+Gopkg.lock
+
