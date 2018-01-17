@@ -171,6 +171,13 @@ Resources:
                 - 'cloudformation:DescribeChangeSet'
                 - 'cloudformation:SetStackPolicy'
                 - 'iam:PassRole'
+                - 'codebuild:StartBuild'
+                - 'codebuild:BatchGetProjects'
+                - 'codebuild:ListProjects'
+                - 'codebuild:StopBuild'
+                - 'codebuild:UpdateProject'
+                - 'codebuild:BatchGetBuilds'
+                - 'iam:PassRole'
                 Effect: Allow
                 Resource: '*'
 
@@ -181,7 +188,7 @@ Resources:
         Type: CODEPIPELINE
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/ubuntu-base:14.04
+        Image: aws/codebuild/golang:1.7.3
         Type: LINUX_CONTAINER
         EnvironmentVariables:
           - Name: S3_BUCKET

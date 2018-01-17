@@ -5,7 +5,7 @@ env:
     # Make sure to provide a valid S3 bucket name (it must exist already).
     # The CodeBuild IAM role must allow write access to it.
     S3_BUCKET: "ArtifactStoreBucket"
-    PACKAGE: "aws-lambda/serverless"
+    PACKAGE: "lambda-test/serverless"
 
 phases:
   install:
@@ -13,6 +13,7 @@ phases:
       # AWS Codebuild Go images use /go for the $GOPATH so copy the
       # application source code into that directory structure.
       - mkdir -p "/go/src/$(dirname ${PACKAGE})"
+      - ls "${CODEBUILD_SRC_DIR}"
       - ln -s "${CODEBUILD_SRC_DIR}" "/go/src/${PACKAGE}"
       # Print all environment variables (handy for AWS CodeBuild logs)
       - env
