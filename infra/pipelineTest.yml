@@ -192,7 +192,7 @@ Resources:
         Type: LINUX_CONTAINER
         EnvironmentVariables:
           - Name: S3_BUCKET
-            Value: ArtifactStoreBucket
+            Value: !Ref 'ArtifactStoreBucket'
       Name: !Sub ${AWS::StackName}GoBuild
       ServiceRole: !Ref GoBuildRole
       Source:
