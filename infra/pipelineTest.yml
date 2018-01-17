@@ -106,7 +106,7 @@ Resources:
               OutputArtifacts:
                 - Name: AppBuild
               Configuration:
-                ProjectName: !Ref GitRepo
+                ProjectName: !Ref 'BuildGo'
               RunOrder: '1'    
         - Name: Deploy
           Actions:
@@ -173,3 +173,31 @@ Resources:
                 - 'iam:PassRole'
                 Effect: Allow
                 Resource: '*'
+
+  BuildGo:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Image: aws/codebuild/ubuntu-base:14.04
+        Type: LINUX_CONTAINER
+        EnvironmentVariables:
+          - Name: S3_BUCKET
+            Value: ArtifactStoreBucket
+      Name: !Sub ${AWS::StackName}GoBuild
+      ServiceRole: !Ref GoBuildRole
+      Source:
+        Type: CODEPIPELINE
+  GoBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          Effect: Allow
+          Principal:
+            Service: codebuild.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
