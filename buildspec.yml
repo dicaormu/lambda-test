@@ -40,7 +40,7 @@ phases:
       # Build the go application
       - go build -o main
       # Package the application with AWS SAM
-      - aws cloudformation package --template-file serverless.yml --s3-bucket ${S3_BUCKET} --output-template-file packaged.yml
+      - aws cloudformation package --template-file ../serverless.yml --s3-bucket ${S3_BUCKET} --output-template-file packaged.yml
 
 artifacts:
   files:
