@@ -19,6 +19,8 @@ phases:
       - env
       # Install golint
       - go get -u github.com/golang/lint/golint
+      # Install testify
+      - go get github.com/stretchr/testify
 
   pre_build:
     commands:
