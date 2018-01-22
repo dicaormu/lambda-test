@@ -115,13 +115,31 @@ Resources:
                 Category: Deploy
                 Owner: AWS
                 Version: 1
-                Provider: CodeDeploy
+                Provider: CloudFormation
             InputArtifacts:
               - Name: AppBuild
             Configuration:
-                ApplicationName: !Ref GitRepo
-                DeploymentGroupName: !Ref GitRepo
+                ActionMode: CHANGE_SET_REPLACE
+                StackName: !Ref GitRepo
+                ChangeSetName: !Ref GitRepo
+                TemplatePath: AppBuild::packaged.yml
+                RoleArn: !GetAtt [CFNRole, Arn]
+                Capabilities: CAPABILITY_IAM
             RunOrder: 1
+          - Name: ExecuteChangeSet
+            ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: CloudFormation
+            InputArtifacts:
+              - Name: AppBuild
+            Configuration:
+                ActionMode: CHANGE_SET_EXECUTE
+                StackName: !Ref GitRepo
+                ChangeSetName: !Ref GitRepo
+                RoleArn: !GetAtt [CFNRole, Arn]
+            RunOrder: 2
   CFNRole:
     Type: AWS::IAM::Role
     Properties:
@@ -139,7 +157,31 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Action:
-                  - 'ec2:*'
+                - 's3:*'
+                - 'cloudformation:CreateStack'
+                - 'cloudformation:DescribeStacks'
+                - 'cloudformation:DeleteStack'
+                - 'cloudformation:UpdateStack'
+                - 'cloudformation:CreateChangeSet'
+                - 'cloudformation:ExecuteChangeSet'
+                - 'cloudformation:DeleteChangeSet'
+                - 'cloudformation:DescribeChangeSet'
+                - 'cloudformation:SetStackPolicy'
+                - 'iam:CreateRole'
+                - 'iam:PassRole'  
+                - 'iam:AttachRolePolicy'
+                - 'iam:DetachRolePolicy'  
+                - 'iam:GetRole'              
+                - 'iam:DeleteRole' 
+                - 'lambda:CreateFunction'  
+                - 'lambda:AddPermission'
+                - 'lambda:CreateAlias'
+                - 'lambda:CreateEventSourceMapping'
+                - 'lambda:DeleteAlias'
+                - 'lambda:DeleteEventSourceMapping'   
+                - 'lambda:DeleteFunction'   
+                - 'lambda:GetFunctionConfiguration'     
+                - 'apigateway:*'   
                 Effect: Allow
                 Resource: '*'
               
@@ -170,7 +212,6 @@ Resources:
                 - 'cloudformation:DeleteChangeSet'
                 - 'cloudformation:DescribeChangeSet'
                 - 'cloudformation:SetStackPolicy'
-                - 'iam:PassRole'
                 - 'codebuild:StartBuild'
                 - 'codebuild:BatchGetProjects'
                 - 'codebuild:ListProjects'
