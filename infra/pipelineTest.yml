@@ -14,8 +14,8 @@ Parameters:
     Description: Serverless pipeline
     Type: String
   GitRepo:
-    Default: wordpress-single-instance.zip
-    Description: The file name of the source artifact, such as myfolder/myartifact.zip
+    Default: reponame
+    Description: The file name of the git hub repository , such as lambda-test
     Type: String
   Email:
     Description: The email address where CodePipeline sends pipeline notifications
@@ -180,7 +180,8 @@ Resources:
                 - 'lambda:DeleteAlias'
                 - 'lambda:DeleteEventSourceMapping'   
                 - 'lambda:DeleteFunction'   
-                - 'lambda:GetFunctionConfiguration'     
+                - 'lambda:GetFunctionConfiguration'  
+                - 'lambda:UpdateFunctionCode'   
                 - 'apigateway:*'   
                 Effect: Allow
                 Resource: '*'
