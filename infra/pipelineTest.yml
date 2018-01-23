@@ -13,6 +13,9 @@ Parameters:
   PipelineName:
     Description: Serverless pipeline
     Type: String
+  ENV:
+    Description: Environement
+    Type: String
   GitRepo:
     Default: reponame
     Description: The file name of the git hub repository , such as lambda-test
@@ -26,18 +29,6 @@ Parameters:
   OAuthToken:
     Description: The OAuthToken of the github repository
     Type: String
-  TestStackName:
-    Default: Test-event-stack
-    Description: A name for the test WordPress stack
-    Type: String
-  ProdStackName:
-    Default: Prod-event-stack
-    Description: A name for the production WordPress stack
-    Type: String
-  ChangeSetName:
-    Default: UpdatePreview-event-stack
-    Description: A name for the production WordPress stack change set
-    Type: String
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -49,16 +40,6 @@ Metadata:
           - Owner
           - GitRepo
           - Email
-      - Label:
-          default: "Test Stack Settings"
-        Parameters:
-          - TemplateFileName
-      - Label:
-          default: "Production Stack Settings"
-        Parameters:
-          - ChangeSetName
-          - ProdStackName
-          - ProdStackConfig
 
 Resources:
   ArtifactStoreBucket:
@@ -74,7 +55,7 @@ Resources:
         Location: !Ref 'ArtifactStoreBucket'
         Type: S3
       DisableInboundStageTransitions: []
-      Name: !Ref 'PipelineName'
+      Name: !Sub '${ENV}-${PipelineName}'   
       RoleArn: !GetAtt [PipelineRole, Arn]
       Stages:
         - Name: GitSource
@@ -120,8 +101,8 @@ Resources:
               - Name: AppBuild
             Configuration:
                 ActionMode: CHANGE_SET_REPLACE
-                StackName: !Ref GitRepo
-                ChangeSetName: !Ref GitRepo
+                StackName: !Sub '${ENV}-${GitRepo}'
+                ChangeSetName: !Sub '${ENV}-${GitRepo}'
                 TemplatePath: AppBuild::packaged.yml
                 RoleArn: !GetAtt [CFNRole, Arn]
                 Capabilities: CAPABILITY_IAM
@@ -136,8 +117,8 @@ Resources:
               - Name: AppBuild
             Configuration:
                 ActionMode: CHANGE_SET_EXECUTE
-                StackName: !Ref GitRepo
-                ChangeSetName: !Ref GitRepo
+                StackName: !Sub '${ENV}-${GitRepo}'
+                ChangeSetName: !Sub '${ENV}-${GitRepo}'
                 RoleArn: !GetAtt [CFNRole, Arn]
             RunOrder: 2
   CFNRole:
@@ -181,7 +162,8 @@ Resources:
                 - 'lambda:DeleteEventSourceMapping'   
                 - 'lambda:DeleteFunction'   
                 - 'lambda:GetFunctionConfiguration'  
-                - 'lambda:UpdateFunctionCode'   
+                - 'lambda:UpdateFunctionCode' 
+                - 'lambda:RemovePermission'  
                 - 'apigateway:*'   
                 Effect: Allow
                 Resource: '*'
